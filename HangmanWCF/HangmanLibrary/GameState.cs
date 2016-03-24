@@ -9,13 +9,26 @@ using System.IO;
 namespace HangmanLibrary
 {
     [ServiceContract]
+    public interface IClientCallback
+    {
+        [OperationContract(IsOneWay = true)]
+        void UpdateUI();
+    }
+
+    [ServiceContract(CallbackContract = typeof(IClientCallback))]
     public interface IGameState
     {
         int WordsTotal { [OperationContract]get; }
+
         int WordsRemaining { [OperationContract]get; }
+
         Word CurrentWord { [OperationContract]get; }
-        [OperationContract]
+
+        [OperationContract(IsOneWay = true)]
         void NewWord();
+
+        [OperationContract(IsOneWay = true)]
+        void RegisterForCallbacks();
     }
 
     [ServiceBehavior(InstanceContextMode = InstanceContextMode.Single)]
@@ -34,7 +47,7 @@ namespace HangmanLibrary
         private StreamReader m_textReader;
         private List<Word> m_words;
         private IEnumerator<Word> m_currentWord;
-
+        private List<IClientCallback> m_clientCallbacks;
         #endregion
 
         #region Constructor
@@ -42,6 +55,7 @@ namespace HangmanLibrary
         {
             m_textReader = new StreamReader("WordsDatabase.txt");
             m_words = new List<Word>();
+            m_clientCallbacks = new List<IClientCallback>();
 
             while (!m_textReader.EndOfStream)
             {
@@ -62,6 +76,12 @@ namespace HangmanLibrary
         {
             if (!m_currentWord.MoveNext())
                 return;
+        }
+
+        public void RegisterForCallbacks()
+        {
+            IClientCallback callback = OperationContext.Current.GetCallbackChannel<IClientCallback>();
+            m_clientCallbacks.Add(callback);
         }
         #endregion
     }

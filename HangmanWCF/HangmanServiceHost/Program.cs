@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.ServiceModel;
+using HangmanLibrary;
 
 namespace HangmanServiceHost
 {
@@ -10,6 +8,26 @@ namespace HangmanServiceHost
     {
         static void Main(string[] args)
         {
+            ServiceHost servHost = null;
+            try
+            {
+                servHost = new ServiceHost(typeof(GameState));
+
+                // All endpoint information is set up in the App.config file.
+
+                servHost.Open();
+                Console.WriteLine("Hangman Service started. Press any key to quit...");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            finally
+            {
+                Console.ReadKey();
+                if (servHost != null)
+                    servHost.Close();
+            }
         }
     }
 }

@@ -6,8 +6,7 @@
         xmlns:local="clr-namespace:HangmanGUIClient"
         mc:Ignorable="d"
         Title="Hangman" Height="480" Width="640"
-        WindowStartupLocation="CenterScreen"
-        ResizeMode="NoResize">
+        WindowStartupLocation="CenterScreen">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height=".2*"/>
