@@ -24,11 +24,19 @@ namespace HangmanLibrary
 
         Word CurrentWord { [OperationContract]get; }
 
+        List<char> LettersRemaining { [OperationContract]get; }
+
         [OperationContract(IsOneWay = true)]
         void NewWord();
 
         [OperationContract(IsOneWay = true)]
-        void RegisterForCallbacks();
+        void RegisterPlayer(Player player);
+
+        [OperationContract(IsOneWay = true)]
+        void ResetLetters();
+
+        [OperationContract(IsOneWay = true)]
+        void RemoveLetterFromPlay(char ch);
     }
 
     [ServiceBehavior(InstanceContextMode = InstanceContextMode.Single)]
@@ -37,6 +45,7 @@ namespace HangmanLibrary
         #region Properties
         public int WordsRemaining { get; private set; }
         public int WordsTotal { get; private set; }
+        public List<char> LettersRemaining { get; private set; }
         public Word CurrentWord
         {
             get { return m_currentWord.Current; }
@@ -47,7 +56,7 @@ namespace HangmanLibrary
         private StreamReader m_textReader;
         private List<Word> m_words;
         private IEnumerator<Word> m_currentWord;
-        private List<IClientCallback> m_clientCallbacks;
+        private Dictionary<Player, IClientCallback> m_dictPlayers;
         #endregion
 
         #region Constructor
@@ -55,8 +64,9 @@ namespace HangmanLibrary
         {
             m_textReader = new StreamReader("WordsDatabase.txt");
             m_words = new List<Word>();
-            m_clientCallbacks = new List<IClientCallback>();
+            m_dictPlayers = new Dictionary<Player, IClientCallback>();
 
+            // Read words from text file and store them in memory
             while (!m_textReader.EndOfStream)
             {
                 try
@@ -66,6 +76,9 @@ namespace HangmanLibrary
                 }
                 catch (Exception) { }
             }
+
+            // Populate the list of letters
+            ResetLetters();
 
             m_currentWord = m_words.GetEnumerator();    // Starts BEFORE the first element in the list
         }
@@ -78,10 +91,35 @@ namespace HangmanLibrary
                 return;
         }
 
-        public void RegisterForCallbacks()
+        public void RegisterPlayer(Player player)
         {
             IClientCallback callback = OperationContext.Current.GetCallbackChannel<IClientCallback>();
-            m_clientCallbacks.Add(callback);
+            m_dictPlayers.Add(player, callback);
+        }
+
+        public void ResetLetters()
+        {
+            LettersRemaining = new List<char>
+            {   'A', 'B', 'C', 'D', 'E', 'F', 'G',
+                'H', 'I', 'J', 'K', 'L', 'M', 'N',
+                'O', 'P', 'Q', 'R', 'S', 'T', 'U',
+                'V', 'W', 'X', 'Y', 'Z'
+            };
+            NotifyClients();
+        }
+
+        public void RemoveLetterFromPlay(char ch)
+        {
+            LettersRemaining.Remove(ch);
+            NotifyClients();
+        }
+        #endregion
+
+        #region Private Methods
+        private void NotifyClients()
+        {
+            foreach (var player in m_dictPlayers)
+                player.Value.UpdateUI();
         }
         #endregion
     }

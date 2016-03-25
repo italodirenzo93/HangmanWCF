@@ -21,20 +21,32 @@
             </Grid.ColumnDefinitions>
 
             <Image x:Name="imgHangman" Grid.Column="0"/>
-            <WrapPanel x:Name="pnlLetters" Grid.Column="1" Orientation="Horizontal">
-                <WrapPanel.Resources>
-                    <Style TargetType="Button">
-                        <Setter Property="Margin" Value="10"/>
-                        <Setter Property="Padding" Value="5,0"/>
-                        <Setter Property="Background" Value="Transparent"/>
-                        <Setter Property="BorderBrush" Value="Transparent"/>
-                        <Setter Property="FontSize" Value="18"/>
-                        <Setter Property="FontWeight" Value="Bold"/>
-                    </Style>
-                </WrapPanel.Resources>
-            </WrapPanel>
+
+            <ItemsControl x:Name="icLetters" Grid.Column="1">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel Orientation="Horizontal">
+                            <WrapPanel.Resources>
+                                <Style TargetType="Button">
+                                    <Setter Property="Margin" Value="10"/>
+                                    <Setter Property="Padding" Value="5,0"/>
+                                    <Setter Property="Background" Value="Transparent"/>
+                                    <Setter Property="BorderBrush" Value="Transparent"/>
+                                    <Setter Property="FontSize" Value="18"/>
+                                    <Setter Property="FontWeight" Value="Bold"/>
+                                </Style>
+                            </WrapPanel.Resources>
+                        </WrapPanel>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Button Content="{Binding}" Click="Letter_Click"/>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
         </Grid>
 
-        <TextBlock x:Name="tbWordInPlay" Grid.Row="2"></TextBlock>
+        <TextBlock x:Name="tbWordInPlay" Grid.Row="2"/>
     </Grid>
 </Window>

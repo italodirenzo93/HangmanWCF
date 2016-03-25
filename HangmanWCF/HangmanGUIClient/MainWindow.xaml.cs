@@ -39,7 +39,13 @@ namespace HangmanGUIClient
                 DuplexChannelFactory<IGameState> gameStateFactory =
                     new DuplexChannelFactory<IGameState>(this, "GameState");
                 m_gameState = gameStateFactory.CreateChannel();
-                m_gameState.RegisterForCallbacks();
+
+                Player p = new Player();
+                p.Name = "Italo";
+                m_gameState.RegisterPlayer(p);
+
+                icLetters.ItemsSource = m_gameState.LettersRemaining;
+                m_gameState.NewWord();
             }
             catch (Exception ex)
             {
@@ -53,12 +59,19 @@ namespace HangmanGUIClient
             if (Dispatcher.Thread == Thread.CurrentThread)
             {
                 // UI update code here...
+                icLetters.ItemsSource = m_gameState.LettersRemaining;
             }
             else
             {
                 // Call asynchronously
                 Dispatcher.BeginInvoke(new UIUpdateDelegate(UpdateUI));
             }
+        }
+
+        private void Letter_Click(object sender, RoutedEventArgs e)
+        {
+            char letter = (char)((Button)e.Source).Content;
+            m_gameState.RemoveLetterFromPlay(letter);
         }
     }
 }
