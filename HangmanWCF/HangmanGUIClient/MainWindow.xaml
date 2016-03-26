@@ -6,13 +6,35 @@
         xmlns:local="clr-namespace:HangmanGUIClient"
         mc:Ignorable="d"
         Title="Hangman" Height="480" Width="640"
-        WindowStartupLocation="CenterOwner">
+        WindowStartupLocation="CenterOwner"
+        Closing="Window_Closing">
     <Grid Margin="10">
         <Grid.RowDefinitions>
             <RowDefinition Height=".2*"/>
             <RowDefinition/>
             <RowDefinition Height=".2*"/>
         </Grid.RowDefinitions>
+
+        <ItemsControl x:Name="icPlayers" Grid.Row="0">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <StackPanel Orientation="Horizontal">
+                        
+                    </StackPanel>
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <Border BorderBrush="Orange" BorderThickness="2">
+                        <StackPanel Orientation="Vertical">
+                            <TextBlock Text="{Binding Name}"/>
+                            <TextBlock Text="{Binding PlayerIndex}"/>
+                            <TextBlock Text="{Binding HasTurn}"/>
+                        </StackPanel>
+                    </Border>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
 
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>

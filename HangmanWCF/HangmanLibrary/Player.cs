@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Runtime.Serialization;
+using System.ServiceModel;
 
 namespace HangmanLibrary
 {
@@ -7,20 +8,26 @@ namespace HangmanLibrary
     public class Player
     {
         [DataMember]
-        public int Score { get; set; }
-        [DataMember]
-        public int LettersGuessedCorrectly { get; set; }
+        public int LettersGuessedCorrectly { get; internal set; }
         [DataMember]
         public List<char> LettersGuessed { get; private set; }
         [DataMember]
-        public bool HasTurn { get; set; }
+        public bool HasTurn { get; internal set; }
         [DataMember]
-        public string Name { get; set; }
+        public string Name { get; private set; }
+        [DataMember]
+        public int PlayerIndex { get; private set; }
+        
+        internal IClientCallback Callback { get; private set; }
+
+        private static int m_pIndex = 1;
 
         public Player(string name)
         {
             Name = name;
+            PlayerIndex = m_pIndex++;
             LettersGuessed = new List<char>();
+            Callback = OperationContext.Current.GetCallbackChannel<IClientCallback>();
         }
     }
 }

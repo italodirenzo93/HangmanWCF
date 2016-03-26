@@ -23,17 +23,19 @@ namespace HangmanLibrary
 
         List<char> LettersRemaining { [OperationContract]get; }
 
-        [OperationContract(IsOneWay = true)]
-        void NewWord();
+        List<Player> Players { [OperationContract]get; }
 
         [OperationContract]
         Player RegisterPlayer(string playerName);
 
+        //[OperationContract(IsOneWay = true)]
+        //void LeaveGame(Player p);
+
         [OperationContract(IsOneWay = true)]
         void ResetLetters();
 
-        [OperationContract]
-        bool GuessLetter(Player p, char ch);
+        [OperationContract(IsOneWay = true)]
+        void GuessLetter(char ch);
     }
 
     [ServiceBehavior(InstanceContextMode = InstanceContextMode.Single)]
@@ -43,6 +45,7 @@ namespace HangmanLibrary
         public int WordsRemaining { get; private set; }
         public int WordsTotal { get; private set; }
         public List<char> LettersRemaining { get; private set; }
+        public List<Player> Players { get; private set; }
         public Word CurrentWord
         {
             get { return m_currentWord.Current; }
@@ -50,10 +53,9 @@ namespace HangmanLibrary
         #endregion
 
         #region Members
-        private StreamReader m_textReader;
         private List<Word> m_words;
         private IEnumerator<Word> m_currentWord;
-        private Dictionary<Player, IClientCallback> m_dictPlayers;
+        private int m_currentPlayerIndex;
 
         private const int MAX_PLAYERS = 4;
         #endregion
@@ -61,21 +63,23 @@ namespace HangmanLibrary
         #region Constructor
         public GameState()
         {
-            m_textReader = new StreamReader("WordsDatabase.txt");
             m_words = new List<Word>();
-            m_dictPlayers = new Dictionary<Player, IClientCallback>();
+            Players = new List<Player>();
 
             // Read words from text file and store them in memory
-            while (!m_textReader.EndOfStream)
+            using (StreamReader reader = new StreamReader("WordsDatabase.txt"))
             {
-                try
+                while (!reader.EndOfStream)
                 {
-                    string[] wordAndHint = m_textReader.ReadLine().Split(',');
-                    m_words.Add(new Word(wordAndHint[0].ToUpperInvariant(), wordAndHint[1]));
-                }
-                catch (Exception)
-                {
-                    continue;   // Just ignore it
+                    try
+                    {
+                        string[] wordAndHint = reader.ReadLine().Split(',');
+                        m_words.Add(new Word(wordAndHint[0].ToUpperInvariant(), wordAndHint[1]));
+                    }
+                    catch (Exception)
+                    {
+                        continue;   // Just ignore it
+                    }
                 }
             }
 
@@ -83,28 +87,37 @@ namespace HangmanLibrary
             ResetLetters();
 
             m_currentWord = m_words.GetEnumerator();    // Starts BEFORE the first element in the list
+            m_currentPlayerIndex = -1;
+
+            // Start the game with a new word
+            NewWord();
         }
         #endregion
 
         #region Public Methods
-        public void NewWord()
-        {
-            if (!m_currentWord.MoveNext())
-                return;
-        }
-
         public Player RegisterPlayer(string playerName)
         {
-            if (m_dictPlayers.Count >= MAX_PLAYERS)
+            if (Players.Count >= MAX_PLAYERS)
                 return null;
 
             Player p = new Player(playerName);
-            p.HasTurn = true;
-            IClientCallback callback = OperationContext.Current.GetCallbackChannel<IClientCallback>();
-            m_dictPlayers.Add(p, callback);
+            Players.Add(p);
 
+            // If they are the first one joining, it's their turn
+            if (Players.Count == 1)
+                QueueNextTurn();
+
+            NotifyClients();
             return p;
         }
+
+        //public void LeaveGame(Player p)
+        //{
+        //    Players.Remove(p);
+        //    if (p.HasTurn)
+        //        QueueNextTurn();
+        //    NotifyClients();
+        //}
 
         public void ResetLetters()
         {
@@ -117,28 +130,50 @@ namespace HangmanLibrary
             NotifyClients();
         }
 
-        public bool GuessLetter(Player p, char ch)
+        public void GuessLetter(char ch)
         {
+            // Remove that letter from play
             LettersRemaining.Remove(ch);
+
+            // Update player information
+            Player p = Players[m_currentPlayerIndex];
 
             p.LettersGuessed.Add(ch);
             if (CurrentWord.WordString.Contains(ch.ToString()))
             {
                 p.LettersGuessedCorrectly += 1;
-                NotifyClients();
-                return true;
             }
 
+            QueueNextTurn();
             NotifyClients();
-            return false;
         }
         #endregion
 
         #region Private Methods
+        private void NewWord()
+        {
+            if (!m_currentWord.MoveNext())
+                return;
+        }
+
         private void NotifyClients()
         {
-            foreach (IClientCallback callback in m_dictPlayers.Values)
-                callback.UpdateUI();
+            foreach (Player p in Players)
+                p.Callback.UpdateUI();
+        }
+
+        private void QueueNextTurn()
+        {
+            // No longer the last player's turn
+            if (m_currentPlayerIndex != -1)
+                Players[m_currentPlayerIndex].HasTurn = false;
+
+            // If all players have gone, back to player 1
+            if (m_currentPlayerIndex == Players.Count - 1)
+                m_currentPlayerIndex = -1;
+
+            m_currentPlayerIndex += 1;
+            Players[m_currentPlayerIndex].HasTurn = true;
         }
         #endregion
     }

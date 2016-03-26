@@ -57,10 +57,6 @@ namespace HangmanGUIClient
                 }
 
                 Title = m_player.Name + " - HangmanWCF";
-
-                // Init UI
-                icLetters.ItemsSource = m_gameState.LettersRemaining;
-                m_gameState.NewWord();
             }
             catch (Exception ex)
             {
@@ -74,7 +70,9 @@ namespace HangmanGUIClient
             if (Dispatcher.Thread == Thread.CurrentThread)
             {
                 // UI update code here...
+                m_player = m_gameState.Players[m_player.PlayerIndex - 1];   // Update the reference
                 icLetters.ItemsSource = m_gameState.LettersRemaining;
+                icPlayers.ItemsSource = m_gameState.Players;
             }
             else
             {
@@ -88,12 +86,18 @@ namespace HangmanGUIClient
             if (m_player.HasTurn)
             {
                 char letter = (char)((Button)e.Source).Content;
-                m_gameState.GuessLetter(m_player, letter);
+                m_gameState.GuessLetter(letter);
             }
             else
             {
                 MessageBox.Show("Wait your turn...");
             }
+        }
+
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            //if (m_player != null)
+            //    m_gameState.LeaveGame(m_player);
         }
     }
 }
