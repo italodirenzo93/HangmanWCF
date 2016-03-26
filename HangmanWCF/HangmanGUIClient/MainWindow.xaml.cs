@@ -29,21 +29,36 @@ namespace HangmanGUIClient
         private delegate void UIUpdateDelegate();
 
         private IGameState m_gameState;
+        private Player m_player;
 
-        public MainWindow()
+        public MainWindow(string playerName)
         {
             InitializeComponent();
 
             try
             {
+                // Open a communication channel with the service and retrieve the game state.
                 DuplexChannelFactory<IGameState> gameStateFactory =
                     new DuplexChannelFactory<IGameState>(this, "GameState");
                 m_gameState = gameStateFactory.CreateChannel();
 
-                Player p = new Player();
-                p.Name = "Italo";
-                m_gameState.RegisterPlayer(p);
+                // Join the game
+                m_player = m_gameState.RegisterPlayer(playerName);
 
+                // If the game is full, exit
+                if (m_player == null)
+                {
+                    MessageBox.Show(
+                        "Game is full. Try joining again later.",
+                        "Game Full",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Exclamation);
+                    Close();
+                }
+
+                Title = m_player.Name + " - HangmanWCF";
+
+                // Init UI
                 icLetters.ItemsSource = m_gameState.LettersRemaining;
                 m_gameState.NewWord();
             }
@@ -70,8 +85,15 @@ namespace HangmanGUIClient
 
         private void Letter_Click(object sender, RoutedEventArgs e)
         {
-            char letter = (char)((Button)e.Source).Content;
-            m_gameState.RemoveLetterFromPlay(letter);
+            if (m_player.HasTurn)
+            {
+                char letter = (char)((Button)e.Source).Content;
+                m_gameState.GuessLetter(m_player, letter);
+            }
+            else
+            {
+                MessageBox.Show("Wait your turn...");
+            }
         }
     }
 }

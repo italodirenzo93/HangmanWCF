@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.ServiceModel;
 using System.IO;
 
@@ -29,14 +26,14 @@ namespace HangmanLibrary
         [OperationContract(IsOneWay = true)]
         void NewWord();
 
-        [OperationContract(IsOneWay = true)]
-        void RegisterPlayer(Player player);
+        [OperationContract]
+        Player RegisterPlayer(string playerName);
 
         [OperationContract(IsOneWay = true)]
         void ResetLetters();
 
-        [OperationContract(IsOneWay = true)]
-        void RemoveLetterFromPlay(char ch);
+        [OperationContract]
+        bool GuessLetter(Player p, char ch);
     }
 
     [ServiceBehavior(InstanceContextMode = InstanceContextMode.Single)]
@@ -57,6 +54,8 @@ namespace HangmanLibrary
         private List<Word> m_words;
         private IEnumerator<Word> m_currentWord;
         private Dictionary<Player, IClientCallback> m_dictPlayers;
+
+        private const int MAX_PLAYERS = 4;
         #endregion
 
         #region Constructor
@@ -74,7 +73,10 @@ namespace HangmanLibrary
                     string[] wordAndHint = m_textReader.ReadLine().Split(',');
                     m_words.Add(new Word(wordAndHint[0].ToUpperInvariant(), wordAndHint[1]));
                 }
-                catch (Exception) { }
+                catch (Exception)
+                {
+                    continue;   // Just ignore it
+                }
             }
 
             // Populate the list of letters
@@ -91,10 +93,17 @@ namespace HangmanLibrary
                 return;
         }
 
-        public void RegisterPlayer(Player player)
+        public Player RegisterPlayer(string playerName)
         {
+            if (m_dictPlayers.Count >= MAX_PLAYERS)
+                return null;
+
+            Player p = new Player(playerName);
+            p.HasTurn = true;
             IClientCallback callback = OperationContext.Current.GetCallbackChannel<IClientCallback>();
-            m_dictPlayers.Add(player, callback);
+            m_dictPlayers.Add(p, callback);
+
+            return p;
         }
 
         public void ResetLetters()
@@ -108,18 +117,28 @@ namespace HangmanLibrary
             NotifyClients();
         }
 
-        public void RemoveLetterFromPlay(char ch)
+        public bool GuessLetter(Player p, char ch)
         {
             LettersRemaining.Remove(ch);
+
+            p.LettersGuessed.Add(ch);
+            if (CurrentWord.WordString.Contains(ch.ToString()))
+            {
+                p.LettersGuessedCorrectly += 1;
+                NotifyClients();
+                return true;
+            }
+
             NotifyClients();
+            return false;
         }
         #endregion
 
         #region Private Methods
         private void NotifyClients()
         {
-            foreach (var player in m_dictPlayers)
-                player.Value.UpdateUI();
+            foreach (IClientCallback callback in m_dictPlayers.Values)
+                callback.UpdateUI();
         }
         #endregion
     }
