@@ -15,6 +15,8 @@ namespace HangmanLibrary
         public bool HasTurn { get; internal set; }
         [DataMember]
         public string Name { get; private set; }
+
+        // NOTE: This property is for display in the UI. Not an index for within an array.
         [DataMember]
         public int PlayerIndex { get; private set; }
         

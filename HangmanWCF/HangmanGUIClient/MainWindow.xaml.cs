@@ -29,7 +29,7 @@ namespace HangmanGUIClient
         private delegate void UIUpdateDelegate();
 
         private IGameState m_gameState;
-        private Player m_player;
+        private readonly int m_playerID;
 
         public MainWindow(string playerName)
         {
@@ -43,10 +43,10 @@ namespace HangmanGUIClient
                 m_gameState = gameStateFactory.CreateChannel();
 
                 // Join the game
-                m_player = m_gameState.RegisterPlayer(playerName);
+                m_playerID = m_gameState.RegisterPlayer(playerName);
 
                 // If the game is full, exit
-                if (m_player == null)
+                if (m_playerID < 0)
                 {
                     MessageBox.Show(
                         "Game is full. Try joining again later.",
@@ -56,7 +56,7 @@ namespace HangmanGUIClient
                     Close();
                 }
 
-                Title = m_player.Name + " - HangmanWCF";
+                Title = playerName + " - HangmanWCF";
             }
             catch (Exception ex)
             {
@@ -70,7 +70,6 @@ namespace HangmanGUIClient
             if (Dispatcher.Thread == Thread.CurrentThread)
             {
                 // UI update code here...
-                m_player = m_gameState.Players[m_player.PlayerIndex - 1];   // Update the reference
                 icLetters.ItemsSource = m_gameState.LettersRemaining;
                 icPlayers.ItemsSource = m_gameState.Players;
             }
@@ -83,7 +82,7 @@ namespace HangmanGUIClient
 
         private void Letter_Click(object sender, RoutedEventArgs e)
         {
-            if (m_player.HasTurn)
+            if (m_gameState.Players[m_playerID].HasTurn)
             {
                 char letter = (char)((Button)e.Source).Content;
                 m_gameState.GuessLetter(letter);
@@ -96,8 +95,8 @@ namespace HangmanGUIClient
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            //if (m_player != null)
-            //    m_gameState.LeaveGame(m_player);
+            if (m_playerID >= 0)
+                m_gameState.LeaveGame(m_playerID);
         }
     }
 }

@@ -26,10 +26,10 @@ namespace HangmanLibrary
         List<Player> Players { [OperationContract]get; }
 
         [OperationContract]
-        Player RegisterPlayer(string playerName);
+        int RegisterPlayer(string playerName);
 
-        //[OperationContract(IsOneWay = true)]
-        //void LeaveGame(Player p);
+        [OperationContract(IsOneWay = true)]
+        void LeaveGame(int playerID);
 
         [OperationContract(IsOneWay = true)]
         void ResetLetters();
@@ -95,10 +95,10 @@ namespace HangmanLibrary
         #endregion
 
         #region Public Methods
-        public Player RegisterPlayer(string playerName)
+        public int RegisterPlayer(string playerName)
         {
             if (Players.Count >= MAX_PLAYERS)
-                return null;
+                return -1;
 
             Player p = new Player(playerName);
             Players.Add(p);
@@ -108,16 +108,20 @@ namespace HangmanLibrary
                 QueueNextTurn();
 
             NotifyClients();
-            return p;
+            return Players.IndexOf(p);
         }
 
-        //public void LeaveGame(Player p)
-        //{
-        //    Players.Remove(p);
-        //    if (p.HasTurn)
-        //        QueueNextTurn();
-        //    NotifyClients();
-        //}
+        public void LeaveGame(int playerID)
+        {
+            Player p = Players[playerID];
+            if (p.HasTurn)
+                QueueNextTurn();
+
+            Players.Remove(p);
+
+            if (Players.Count > 0)
+                NotifyClients();
+        }
 
         public void ResetLetters()
         {
