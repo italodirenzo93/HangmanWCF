@@ -45,6 +45,8 @@ namespace HangmanGUIClient
                 // Join the game
                 m_playerID = m_gameState.RegisterPlayer(playerName);
 
+                // Get or Set the currentWord
+
                 // If the game is full, exit
                 if (m_playerID < 0)
                 {
@@ -72,6 +74,9 @@ namespace HangmanGUIClient
                 // UI update code here...
                 icLetters.ItemsSource = m_gameState.LettersRemaining;
                 icPlayers.ItemsSource = m_gameState.Players;
+
+                UpdatePicture();
+                icWordInPlay.ItemsSource = m_gameState.LetterTiles;
             }
             else
             {
@@ -91,6 +96,13 @@ namespace HangmanGUIClient
             {
                 MessageBox.Show("Wait your turn...");
             }
+        }
+
+        private void UpdatePicture()
+        {
+            // Set players current hangman state pic
+            int incorrectGuesses = m_gameState.Players[m_playerID].LettersGuessed.Count - m_gameState.Players[m_playerID].LettersScore;
+            imgHangman.Source = new BitmapImage(new Uri(@"/images/HM_" + incorrectGuesses + ".png", UriKind.Relative));
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)

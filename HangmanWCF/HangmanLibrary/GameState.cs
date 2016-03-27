@@ -23,6 +23,8 @@ namespace HangmanLibrary
 
         List<char> LettersRemaining { [OperationContract]get; }
 
+        List<char> LetterTiles { [OperationContract]get; }
+
         List<Player> Players { [OperationContract]get; }
 
         [OperationContract]
@@ -45,6 +47,7 @@ namespace HangmanLibrary
         public int WordsRemaining { get; private set; }
         public int WordsTotal { get; private set; }
         public List<char> LettersRemaining { get; private set; }
+        public List<char> LetterTiles { get; private set; }
         public List<Player> Players { get; private set; }
         public Word CurrentWord
         {
@@ -145,8 +148,16 @@ namespace HangmanLibrary
             p.LettersGuessed.Add(ch);
             if (CurrentWord.WordString.Contains(ch.ToString()))
             {
-                p.LettersGuessedCorrectly += 1;
+                for (int i = 0; i < CurrentWord.WordString.Length; i++)
+                {
+                    if (CurrentWord.WordString[i] == ch)
+                        LetterTiles[i] = ch;
+                }
+
+                p.LettersScore += 1;
             }
+
+            
 
             QueueNextTurn();
             NotifyClients();
@@ -158,6 +169,17 @@ namespace HangmanLibrary
         {
             if (!m_currentWord.MoveNext())
                 return;
+            else
+            {
+                LetterTiles = new List<char>(CurrentWord.WordString.Length);
+                foreach (char letter in CurrentWord.WordString)
+                {
+                    if (letter == ' ')
+                        LetterTiles.Add(' ');
+                    else
+                        LetterTiles.Add('_');
+                }
+            }
         }
 
         private void NotifyClients()

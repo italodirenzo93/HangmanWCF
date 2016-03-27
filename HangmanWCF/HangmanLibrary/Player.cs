@@ -8,7 +8,7 @@ namespace HangmanLibrary
     public class Player
     {
         [DataMember]
-        public int LettersGuessedCorrectly { get; internal set; }
+        public int LettersScore { get; internal set; }
         [DataMember]
         public List<char> LettersGuessed { get; private set; }
         [DataMember]

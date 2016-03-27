@@ -50,7 +50,7 @@
                         <WrapPanel Orientation="Horizontal">
                             <WrapPanel.Resources>
                                 <Style TargetType="Button">
-                                    <Setter Property="Margin" Value="10"/>
+                                    <Setter Property="Margin" Value="7"/>
                                     <Setter Property="Padding" Value="5,0"/>
                                     <Setter Property="Background" Value="Transparent"/>
                                     <Setter Property="BorderBrush" Value="Transparent"/>
@@ -68,7 +68,30 @@
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
         </Grid>
+        <ItemsControl x:Name="icWordInPlay" Grid.Row="2">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <StackPanel Orientation="Horizontal">
+                        <StackPanel.Resources>
+                            <Style TargetType="Label">
+                                <Setter Property="Margin" Value="7"/>
+                                <Setter Property="Padding" Value="5,0"/>
+                                <Setter Property="Background" Value="Transparent"/>
+                                <Setter Property="BorderBrush" Value="Transparent"/>
+                                <Setter Property="FontSize" Value="18"/>
+                                <Setter Property="FontWeight" Value="Bold"/>
+                            </Style>
+                        </StackPanel.Resources>
+                    </StackPanel>
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <Label Content="{Binding}"/>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
 
-        <TextBlock x:Name="tbWordInPlay" Grid.Row="2"/>
+        <!--<TextBlock x:Name="tbWordInPlay" Grid.Row="2" HorizontalAlignment="Center" VerticalAlignment="Center"/>-->
     </Grid>
 </Window>
