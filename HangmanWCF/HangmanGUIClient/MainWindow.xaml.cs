@@ -69,14 +69,20 @@ namespace HangmanGUIClient
         // Client Callback
         public void UpdateUI()
         {
+
             if (Dispatcher.Thread == Thread.CurrentThread)
             {
                 // UI update code here...
                 icLetters.ItemsSource = m_gameState.LettersRemaining;
                 icPlayers.ItemsSource = m_gameState.Players;
 
-                UpdatePicture();
                 icWordInPlay.ItemsSource = m_gameState.LetterTiles;
+                foreach (Player p in m_gameState.Players)
+                {
+                    if (p.PlayerIndex == m_gameState.Players[m_playerID].PlayerIndex)
+                        UpdatePicture();
+                }
+
             }
             else
             {
@@ -84,6 +90,7 @@ namespace HangmanGUIClient
                 Dispatcher.BeginInvoke(new UIUpdateDelegate(UpdateUI));
             }
         }
+            
 
         private void Letter_Click(object sender, RoutedEventArgs e)
         {
@@ -102,7 +109,16 @@ namespace HangmanGUIClient
         {
             // Set players current hangman state pic
             int incorrectGuesses = m_gameState.Players[m_playerID].LettersGuessed.Count - m_gameState.Players[m_playerID].LettersScore;
-            imgHangman.Source = new BitmapImage(new Uri(@"/images/HM_" + incorrectGuesses + ".png", UriKind.Relative));
+
+            if (incorrectGuesses == 6)
+            {
+                imgHangman.Source = new BitmapImage(new Uri(@"/images/HM_" + incorrectGuesses + ".png", UriKind.Relative));
+                icLetters.IsEnabled = false;
+                btnGuessWord.IsEnabled = false;
+                m_gameState.LeaveGame(m_playerID);
+            }
+            else
+                imgHangman.Source = new BitmapImage(new Uri(@"/images/HM_" + incorrectGuesses + ".png", UriKind.Relative));
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)

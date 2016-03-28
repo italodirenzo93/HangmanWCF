@@ -157,9 +157,7 @@ namespace HangmanLibrary
 
                 p.LettersScore += 1;
             }
-
             
-
             QueueNextTurn();
             NotifyClients();
         }
