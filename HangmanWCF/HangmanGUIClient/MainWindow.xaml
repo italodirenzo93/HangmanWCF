@@ -54,8 +54,8 @@
             <ItemsControl x:Name="icLetters" Grid.Column="1">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
-                        <WrapPanel Orientation="Horizontal">
-                            <WrapPanel.Resources>
+                        <UniformGrid Columns="4">
+                            <UniformGrid.Resources>
                                 <Style TargetType="Button">
                                     <Setter Property="Margin" Value="7"/>
                                     <Setter Property="Padding" Value="5,0"/>
@@ -64,8 +64,8 @@
                                     <Setter Property="FontSize" Value="18"/>
                                     <Setter Property="FontWeight" Value="Bold"/>
                                 </Style>
-                            </WrapPanel.Resources>
-                        </WrapPanel>
+                            </UniformGrid.Resources>
+                        </UniformGrid>
                     </ItemsPanelTemplate>
                 </ItemsControl.ItemsPanel>
                 <ItemsControl.ItemTemplate>
