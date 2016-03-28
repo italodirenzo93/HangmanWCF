@@ -109,7 +109,9 @@
       <Name>HangmanLibrary</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Resource Include="images\HM_6.png" />
+  </ItemGroup>
   <ItemGroup>
     <Resource Include="images\HM_0.png" />
     <Resource Include="images\HM_1.png" />
@@ -117,7 +119,6 @@
     <Resource Include="images\HM_3.png" />
     <Resource Include="images\HM_4.png" />
     <Resource Include="images\HM_5.png" />
-    <Resource Include="images\HM_6.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
