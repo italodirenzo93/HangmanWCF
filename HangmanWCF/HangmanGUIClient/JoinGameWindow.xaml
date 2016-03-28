@@ -7,7 +7,7 @@
         mc:Ignorable="d"
         Title="Join Game - HangmanWCF" Height="120" Width="400"
         WindowStartupLocation="CenterScreen" ResizeMode="NoResize">
-    <Grid Margin="10">
+    <Grid Margin="10" KeyDown="on_KeyDownEvent">
         <Grid.RowDefinitions>
             <RowDefinition/>
             <RowDefinition Height="auto"/>

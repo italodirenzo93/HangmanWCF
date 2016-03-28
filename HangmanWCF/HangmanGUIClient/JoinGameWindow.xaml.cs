@@ -38,6 +38,23 @@ namespace HangmanGUIClient
             }
         }
 
+        private void on_KeyDownEvent(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+            {
+                if (!string.IsNullOrWhiteSpace(tbName.Text))
+                {
+                    MainWindow mainWindow = new MainWindow(tbName.Text);
+                    mainWindow.Show();
+                    Close();
+                }
+                else
+                {
+                    MessageBox.Show("Player name cannot be blank.", "Error", MessageBoxButton.OK, MessageBoxImage.Exclamation);
+                }
+            }
+        }
+
         private void Close_Click(object sender, RoutedEventArgs e)
         {
             Close();

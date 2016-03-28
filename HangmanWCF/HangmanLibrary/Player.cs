@@ -12,7 +12,7 @@ namespace HangmanLibrary
         [DataMember]
         public List<char> LettersGuessed { get; private set; }
         [DataMember]
-        public bool HasTurn { get; internal set; }
+        public string HasTurn { get; internal set; }
         [DataMember]
         public string Name { get; private set; }
 

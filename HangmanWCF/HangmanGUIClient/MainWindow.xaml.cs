@@ -87,7 +87,7 @@ namespace HangmanGUIClient
 
         private void Letter_Click(object sender, RoutedEventArgs e)
         {
-            if (m_gameState.Players[m_playerID].HasTurn)
+            if (m_gameState.Players[m_playerID].HasTurn == "Green")
             {
                 char letter = (char)((Button)e.Source).Content;
                 m_gameState.GuessLetter(letter);
@@ -109,6 +109,11 @@ namespace HangmanGUIClient
         {
             if (m_playerID >= 0)
                 m_gameState.LeaveGame(m_playerID);
+        }
+
+        private void onGuessWork_Clicked(object sender, RoutedEventArgs e)
+        {
+
         }
     }
 }

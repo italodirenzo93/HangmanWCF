@@ -25,11 +25,18 @@
             </ItemsControl.ItemsPanel>
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                    <Border BorderBrush="Orange" BorderThickness="2">
+                    <Border BorderBrush="{Binding HasTurn}" BorderThickness="2">
                         <StackPanel Orientation="Vertical">
-                            <TextBlock Text="{Binding Name}"/>
-                            <TextBlock Text="{Binding PlayerIndex}"/>
-                            <TextBlock Text="{Binding HasTurn}"/>
+                            <StackPanel Orientation="Horizontal" Margin="1,1,1,1">
+                                <TextBlock Text="Player "/>
+                                <TextBlock Text="{Binding PlayerIndex}"/>
+                                <TextBlock Text=": "/>
+                                <TextBlock Text="{Binding Name}"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="Score: "/>
+                                <TextBlock Text="{Binding LettersScore}"/>
+                            </StackPanel>
                         </StackPanel>
                     </Border>
                 </DataTemplate>
@@ -91,6 +98,7 @@
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ItemsControl>
+        <Button x:Name="btnGuessWord" Content="Guess the Word" Height="20" Width="100" Grid.Row="2" HorizontalAlignment="Right" Margin="5,5,5,5" Click="onGuessWork_Clicked"/>
 
         <!--<TextBlock x:Name="tbWordInPlay" Grid.Row="2" HorizontalAlignment="Center" VerticalAlignment="Center"/>-->
     </Grid>
