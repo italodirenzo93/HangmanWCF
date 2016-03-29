@@ -25,7 +25,10 @@
             </ItemsControl.ItemsPanel>
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                    <Border BorderBrush="{Binding HasTurn}" BorderThickness="2">
+                    <Border BorderBrush="{Binding 
+                        Path=HasTurn, 
+                        Converter={x:Static local:HasTurnConverter.Instance}}"    
+                        BorderThickness="2">
                         <StackPanel Orientation="Vertical">
                             <StackPanel Orientation="Horizontal" Margin="1,1,1,1">
                                 <TextBlock Text="Player "/>

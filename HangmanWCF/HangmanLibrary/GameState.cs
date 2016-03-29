@@ -104,7 +104,7 @@ namespace HangmanLibrary
                 return -1;
 
             Player p = new Player(playerName);
-            p.HasTurn = "Orange";
+            p.HasTurn = false;
             Players.Add(p);
 
             // If they are the first one joining, it's their turn
@@ -118,7 +118,7 @@ namespace HangmanLibrary
         public void LeaveGame(int playerID)
         {
             Player p = Players[playerID];
-            if (p.HasTurn == "Green")
+            if (p.HasTurn == true)
                 QueueNextTurn();
 
             Players.Remove(p);
@@ -191,14 +191,14 @@ namespace HangmanLibrary
         {
             // No longer the last player's turn
             if (m_currentPlayerIndex != -1)
-                Players[m_currentPlayerIndex].HasTurn = "Orange";
+                Players[m_currentPlayerIndex].HasTurn = false;
 
             // If all players have gone, back to player 1
             if (m_currentPlayerIndex == Players.Count - 1)
                 m_currentPlayerIndex = -1;
 
             m_currentPlayerIndex += 1;
-            Players[m_currentPlayerIndex].HasTurn = "Green";
+            Players[m_currentPlayerIndex].HasTurn = true;
         }
         #endregion
     }
