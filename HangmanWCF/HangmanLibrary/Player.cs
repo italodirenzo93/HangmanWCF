@@ -12,6 +12,8 @@ namespace HangmanLibrary
         [DataMember]
         public List<char> LettersGuessed { get; private set; }
         [DataMember]
+        public int IncorrectGuesses { get; internal set; }
+        [DataMember]
         public bool? HasTurn { get; internal set; }
         [DataMember]
         public string Name { get; private set; }
@@ -29,6 +31,7 @@ namespace HangmanLibrary
             Name = name;
             PlayerIndex = m_pIndex++;
             LettersGuessed = new List<char>();
+            IncorrectGuesses = 0;
             Callback = OperationContext.Current.GetCallbackChannel<IClientCallback>();
         }
     }

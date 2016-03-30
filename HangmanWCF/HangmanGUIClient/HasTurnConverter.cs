@@ -15,13 +15,14 @@ namespace HangmanGUIClient
 
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value.Equals(true))
+            bool? hasTurn = (bool?)value;
+            if (hasTurn == true)
             {
                 return "Green";
             }
-            else if (value.Equals(false))
+            else if (hasTurn == false)
             {
-                return "Orange";
+                return "Blue";
             }
             else
                 return "Red";

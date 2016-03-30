@@ -5,7 +5,6 @@ using System.IO;
 
 namespace HangmanLibrary
 {
-    [ServiceContract]
     public interface IClientCallback
     {
         [OperationContract(IsOneWay = true)]
@@ -61,6 +60,7 @@ namespace HangmanLibrary
         private int m_currentPlayerIndex;
 
         private const int MAX_PLAYERS = 4;
+        private const int MAX_INCORRECT_GUESSES = 6;
         #endregion
 
         #region Constructor
@@ -157,6 +157,12 @@ namespace HangmanLibrary
 
                 p.LettersScore += 1;
             }
+            else
+            {
+                p.IncorrectGuesses += 1;
+                if (p.IncorrectGuesses == MAX_INCORRECT_GUESSES)
+                    p.HasTurn = null;
+            }
             
             QueueNextTurn();
             NotifyClients();
@@ -190,7 +196,7 @@ namespace HangmanLibrary
         private void QueueNextTurn()
         {
             // No longer the last player's turn
-            if (m_currentPlayerIndex != -1)
+            if (m_currentPlayerIndex != -1 && Players[m_currentPlayerIndex].HasTurn.HasValue)
                 Players[m_currentPlayerIndex].HasTurn = false;
 
             // If all players have gone, back to player 1
@@ -198,6 +204,20 @@ namespace HangmanLibrary
                 m_currentPlayerIndex = -1;
 
             m_currentPlayerIndex += 1;
+
+            // Make sure we don't move out of range
+            if (m_currentPlayerIndex == Players.Count)
+                m_currentPlayerIndex = 0;
+
+            // Make sure the player is not "out"
+            while (Players[m_currentPlayerIndex].HasTurn == null)
+            {
+                m_currentPlayerIndex += 1;
+                // If all players have gone, back to player 1
+                if (m_currentPlayerIndex == Players.Count)
+                    m_currentPlayerIndex = 0;
+            }
+
             Players[m_currentPlayerIndex].HasTurn = true;
         }
         #endregion
