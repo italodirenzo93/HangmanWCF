@@ -31,6 +31,7 @@ namespace HangmanGUIClient
         private IGameState m_gameState;
         private readonly int m_playerID;
 
+        #region Constructor
         public MainWindow(string playerName)
         {
             InitializeComponent();
@@ -65,6 +66,7 @@ namespace HangmanGUIClient
                 MessageBox.Show(ex.Message);
             }
         }
+        #endregion
 
         // Client Callback
         public void UpdateUI()
@@ -79,7 +81,8 @@ namespace HangmanGUIClient
                 if (m_gameState.Players[m_playerID].HasTurn == null)
                 {
                     icLetters.IsEnabled = false;
-                    btnGuessWord.IsEnabled = false;
+                    btnGuess.IsEnabled = false;
+                    btnHint.IsEnabled = false;
                 }
                 UpdatePicture();
             }
@@ -89,8 +92,8 @@ namespace HangmanGUIClient
                 Dispatcher.BeginInvoke(new UIUpdateDelegate(UpdateUI));
             }
         }
-            
 
+        #region Event Handlers
         private void Letter_Click(object sender, RoutedEventArgs e)
         {
             if (m_gameState.Players[m_playerID].HasTurn == true)
@@ -104,21 +107,37 @@ namespace HangmanGUIClient
             }
         }
 
-        private void UpdatePicture()
-        {
-            int incorrectGuesses = m_gameState.Players[m_playerID].IncorrectGuesses;
-            imgHangman.Source = new BitmapImage(new Uri(@"/images/HM_" + incorrectGuesses + ".png", UriKind.Relative));
-        }
-
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             if (m_playerID >= 0)
                 m_gameState.LeaveGame(m_playerID);
         }
 
-        private void onGuessWork_Clicked(object sender, RoutedEventArgs e)
+        private void btnHint_Click(object sender, RoutedEventArgs e)
         {
-
+            MessageBox.Show(
+                m_gameState.CurrentWord.Hint,
+                "Hint",
+                MessageBoxButton.OK,
+                MessageBoxImage.Information);
         }
+
+        private void btnGuess_Click(object sender, RoutedEventArgs e)
+        {
+            if (m_gameState.Players[m_playerID].HasTurn == true)
+            {
+                GuessWordWindow guessWindow = new GuessWordWindow(m_gameState, tbStatus);
+                guessWindow.ShowDialog();
+            }
+        }
+        #endregion
+
+        #region Private Methods
+        private void UpdatePicture()
+        {
+            int incorrectGuesses = m_gameState.Players[m_playerID].IncorrectGuesses;
+            imgHangman.Source = new BitmapImage(new Uri(@"/images/HM_" + incorrectGuesses + ".png", UriKind.Relative));
+        }
+        #endregion
     }
 }

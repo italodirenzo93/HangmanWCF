@@ -37,6 +37,9 @@ namespace HangmanLibrary
 
         [OperationContract(IsOneWay = true)]
         void GuessLetter(char ch);
+
+        [OperationContract]
+        string GuessWord(string word);
     }
 
     [ServiceBehavior(InstanceContextMode = InstanceContextMode.Single)]
@@ -166,6 +169,29 @@ namespace HangmanLibrary
             
             QueueNextTurn();
             NotifyClients();
+        }
+
+        public string GuessWord(string word)
+        {
+            Player p = Players[m_currentPlayerIndex];
+            string message;
+            if (word == CurrentWord.WordString)
+            {
+                message = string.Format("{0} guessed the word! It was {1}.", p.Name, CurrentWord.WordString);
+                NewWord();
+                ResetLetters();
+
+                p.LettersGuessed.Clear();
+                p.IncorrectGuesses = 0;
+            }
+            else
+            {
+                message = string.Format("{0} attempted to guess the word. The word is not {1}", p.Name, word);
+                p.IncorrectGuesses += 1;
+            }
+            QueueNextTurn();
+            NotifyClients();
+            return message;
         }
         #endregion
 
