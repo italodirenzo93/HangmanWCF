@@ -21,14 +21,12 @@ namespace HangmanGUIClient
     /// </summary>
     public partial class GuessWordWindow : Window
     {
-        private IGameState m_gameState;
-        private TextBlock m_message;
+        private readonly IGameState m_gameState;
 
-        public GuessWordWindow(IGameState gameState, TextBlock message)
+        public GuessWordWindow(IGameState gameState)
         {
             InitializeComponent();
             m_gameState = gameState;
-            m_message = message;
         }
 
         private void btnGuess_Click(object sender, RoutedEventArgs e)
@@ -36,7 +34,7 @@ namespace HangmanGUIClient
             string word = tbWord.Text.ToUpper();
             if (!string.IsNullOrWhiteSpace(word))
             {
-                m_message.Text = m_gameState.GuessWord(word);
+                m_gameState.GuessWord(word);
                 this.Close();
             }
             else

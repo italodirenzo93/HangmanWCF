@@ -28,7 +28,7 @@ namespace HangmanGUIClient
     {
         private delegate void UIUpdateDelegate();
 
-        private IGameState m_gameState;
+        private readonly IGameState m_gameState;
         private readonly int m_playerID;
 
         #region Constructor
@@ -45,8 +45,6 @@ namespace HangmanGUIClient
 
                 // Join the game
                 m_playerID = m_gameState.RegisterPlayer(playerName);
-
-                // Get or Set the currentWord
 
                 // If the game is full, exit
                 if (m_playerID < 0)
@@ -78,13 +76,28 @@ namespace HangmanGUIClient
                 icLetters.ItemsSource = m_gameState.LettersRemaining;
                 icPlayers.ItemsSource = m_gameState.Players;
                 icWordInPlay.ItemsSource = m_gameState.LetterTiles;
-                if (m_gameState.Players[m_playerID].HasTurn == null)
+                tbStatus.Text = m_gameState.UpdateMessage;
+                UpdatePicture();
+
+                if (m_gameState.Players[m_playerID].HasTurn == null || m_gameState.CurrentWord == null)
                 {
                     icLetters.IsEnabled = false;
                     btnGuess.IsEnabled = false;
                     btnHint.IsEnabled = false;
+                    if (m_gameState.CurrentWord == null)
+                    {
+                        Player winner = m_gameState.Players.OrderByDescending(p => p.LettersScore).FirstOrDefault();
+
+                        MessageBox.Show(
+                            string.Format(
+                                "There are no more words left to be guessed. The winner is {0} with {1} points.",
+                                winner.Name,
+                                winner.LettersScore),
+                            "Game Complete",
+                            MessageBoxButton.OK,
+                            MessageBoxImage.Information);
+                    }
                 }
-                UpdatePicture();
             }
             else
             {
@@ -126,7 +139,7 @@ namespace HangmanGUIClient
         {
             if (m_gameState.Players[m_playerID].HasTurn == true)
             {
-                GuessWordWindow guessWindow = new GuessWordWindow(m_gameState, tbStatus);
+                GuessWordWindow guessWindow = new GuessWordWindow(m_gameState);
                 guessWindow.ShowDialog();
             }
         }

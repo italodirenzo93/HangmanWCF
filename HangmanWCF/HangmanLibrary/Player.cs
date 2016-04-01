@@ -34,5 +34,12 @@ namespace HangmanLibrary
             IncorrectGuesses = 0;
             Callback = OperationContext.Current.GetCallbackChannel<IClientCallback>();
         }
+
+        internal void Reset()
+        {
+            LettersGuessed.Clear();
+            IncorrectGuesses = 0;
+            HasTurn = false;
+        }
     }
 }

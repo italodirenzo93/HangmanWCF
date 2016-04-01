@@ -26,6 +26,8 @@ namespace HangmanLibrary
 
         List<Player> Players { [OperationContract]get; }
 
+        string UpdateMessage { [OperationContract]get; }
+
         [OperationContract]
         int RegisterPlayer(string playerName);
 
@@ -38,8 +40,8 @@ namespace HangmanLibrary
         [OperationContract(IsOneWay = true)]
         void GuessLetter(char ch);
 
-        [OperationContract]
-        string GuessWord(string word);
+        [OperationContract(IsOneWay = true)]
+        void GuessWord(string word);
     }
 
     [ServiceBehavior(InstanceContextMode = InstanceContextMode.Single)]
@@ -51,6 +53,7 @@ namespace HangmanLibrary
         public List<char> LettersRemaining { get; private set; }
         public List<char> LetterTiles { get; private set; }
         public List<Player> Players { get; private set; }
+        public string UpdateMessage { get; private set; }
         public Word CurrentWord
         {
             get { return m_currentWord.Current; }
@@ -130,19 +133,10 @@ namespace HangmanLibrary
                 NotifyClients();
         }
 
-        public void ResetLetters()
-        {
-            LettersRemaining = new List<char>
-            {   'A', 'B', 'C', 'D', 'E', 'F', 'G',
-                'H', 'I', 'J', 'K', 'L', 'M', 'N',
-                'O', 'P', 'Q', 'R', 'S', 'T', 'U',
-                'V', 'W', 'X', 'Y', 'Z'
-            };
-            NotifyClients();
-        }
-
         public void GuessLetter(char ch)
         {
+            UpdateMessage = string.Empty;
+
             // Remove that letter from play
             LettersRemaining.Remove(ch);
 
@@ -159,6 +153,16 @@ namespace HangmanLibrary
                 }
 
                 p.LettersScore += 1;
+
+                // Check for a win
+                if (new string(LetterTiles.ToArray()) == CurrentWord.WordString)
+                {
+                    UpdateMessage = "Word was found! " + CurrentWord.WordString;
+                    NewWord();
+                    ResetLetters();
+                    foreach (Player pl in Players)
+                        pl.Reset();
+                }
             }
             else
             {
@@ -171,13 +175,12 @@ namespace HangmanLibrary
             NotifyClients();
         }
 
-        public string GuessWord(string word)
+        public void GuessWord(string word)
         {
             Player p = Players[m_currentPlayerIndex];
-            string message;
             if (word == CurrentWord.WordString)
             {
-                message = string.Format("{0} guessed the word! It was {1}.", p.Name, CurrentWord.WordString);
+                UpdateMessage = string.Format("{0} guessed the word! It was {1}.", p.Name, CurrentWord.WordString);
                 NewWord();
                 ResetLetters();
 
@@ -186,12 +189,11 @@ namespace HangmanLibrary
             }
             else
             {
-                message = string.Format("{0} attempted to guess the word. The word is not {1}", p.Name, word);
+                UpdateMessage = string.Format("{0} attempted to guess the word. The word is not {1}", p.Name, word);
                 p.IncorrectGuesses += 1;
             }
             QueueNextTurn();
             NotifyClients();
-            return message;
         }
         #endregion
 
@@ -211,6 +213,17 @@ namespace HangmanLibrary
                         LetterTiles.Add('_');
                 }
             }
+        }
+
+        public void ResetLetters()
+        {
+            LettersRemaining = new List<char>
+            {   'A', 'B', 'C', 'D', 'E', 'F', 'G',
+                'H', 'I', 'J', 'K', 'L', 'M', 'N',
+                'O', 'P', 'Q', 'R', 'S', 'T', 'U',
+                'V', 'W', 'X', 'Y', 'Z'
+            };
+            NotifyClients();
         }
 
         private void NotifyClients()
