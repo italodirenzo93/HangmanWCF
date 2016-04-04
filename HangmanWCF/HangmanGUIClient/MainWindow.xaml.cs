@@ -30,6 +30,7 @@ namespace HangmanGUIClient
 
         private readonly IGameState m_gameState;
         private readonly int m_playerID;
+        private bool gameHasEnded = false;
 
         #region Constructor
         public MainWindow(string playerName)
@@ -77,6 +78,8 @@ namespace HangmanGUIClient
                 icPlayers.ItemsSource = m_gameState.Players;
                 icWordInPlay.ItemsSource = m_gameState.LetterTiles;
                 tbStatus.Text = m_gameState.UpdateMessage;
+                tbWordsRemaining.Text = m_gameState.WordsRemaining.ToString();
+                tbLettersRemaining.Text = m_gameState.LettersRemaining.Count.ToString();
                 UpdatePicture();
 
                 if (m_gameState.Players[m_playerID].HasTurn == null || m_gameState.CurrentWord == null)
@@ -84,8 +87,10 @@ namespace HangmanGUIClient
                     icLetters.IsEnabled = false;
                     btnGuess.IsEnabled = false;
                     btnHint.IsEnabled = false;
-                    if (m_gameState.CurrentWord == null)
+                    if (m_gameState.CurrentWord == null && gameHasEnded == false)
                     {
+                        gameHasEnded = true;
+
                         Player winner = m_gameState.Players.OrderByDescending(p => p.LettersScore).FirstOrDefault();
 
                         MessageBox.Show(

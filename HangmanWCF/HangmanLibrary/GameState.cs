@@ -48,7 +48,23 @@ namespace HangmanLibrary
     public class GameState : IGameState
     {
         #region Properties
-        public int WordsRemaining { get; private set; }
+        public int WordsRemaining
+        {
+            get
+            {
+                int current_index = 0;
+                foreach(var w in m_words)
+                {
+                    if (w.WordString != m_currentWord.Current.WordString)
+                        ++current_index;
+                    else
+                        break;
+                }
+                    
+                return m_words.Count - current_index;
+            }
+            private set { }
+        }
         public int WordsTotal { get; private set; }
         public List<char> LettersRemaining { get; private set; }
         public List<char> LetterTiles { get; private set; }
@@ -67,6 +83,7 @@ namespace HangmanLibrary
 
         private const int MAX_PLAYERS = 4;
         private const int MAX_INCORRECT_GUESSES = 6;
+        private const int POINTS_PER_WORD_GUESSED = 5;
         #endregion
 
         #region Constructor
@@ -180,12 +197,14 @@ namespace HangmanLibrary
             Player p = Players[m_currentPlayerIndex];
             if (word == CurrentWord.WordString)
             {
+                p.LettersScore += POINTS_PER_WORD_GUESSED;
                 UpdateMessage = string.Format("{0} guessed the word! It was {1}.", p.Name, CurrentWord.WordString);
                 NewWord();
                 ResetLetters();
 
                 p.LettersGuessed.Clear();
-                p.IncorrectGuesses = 0;
+                foreach(var player in Players)
+                    player.IncorrectGuesses = 0;
             }
             else
             {

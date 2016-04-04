@@ -22,6 +22,7 @@ namespace HangmanGUIClient
         public JoinGameWindow()
         {
             InitializeComponent();
+            tbName.Focus();
         }
 
         private void JoinGame_Click(object sender, RoutedEventArgs e)

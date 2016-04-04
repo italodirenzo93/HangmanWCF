@@ -27,6 +27,7 @@ namespace HangmanGUIClient
         {
             InitializeComponent();
             m_gameState = gameState;
+            tbWord.Focus();
         }
 
         private void btnGuess_Click(object sender, RoutedEventArgs e)
