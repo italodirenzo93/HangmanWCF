@@ -80,7 +80,9 @@ namespace HangmanGUIClient
                 tbStatus.Text = m_gameState.UpdateMessage;
                 tbWordsRemaining.Text = m_gameState.WordsRemaining.ToString();
                 tbLettersRemaining.Text = m_gameState.LettersRemaining.Count.ToString();
-                UpdatePicture();
+
+                if (!gameHasEnded)
+                    UpdatePicture();
 
                 if (m_gameState.Players[m_playerID].HasTurn == null || m_gameState.CurrentWord == null)
                 {
