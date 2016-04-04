@@ -77,12 +77,21 @@ namespace HangmanGUIClient
                 icLetters.ItemsSource = m_gameState.LettersRemaining;
                 icPlayers.ItemsSource = m_gameState.Players;
                 icWordInPlay.ItemsSource = m_gameState.LetterTiles;
+
                 tbStatus.Text = m_gameState.UpdateMessage;
                 tbWordsRemaining.Text = m_gameState.WordsRemaining.ToString();
                 tbLettersRemaining.Text = m_gameState.LettersRemaining.Count.ToString();
 
                 if (!gameHasEnded)
-                    UpdatePicture();
+                UpdatePicture();
+
+                if (m_gameState.Players[m_playerID].HasTurn.HasValue)
+                {
+                    icLetters.IsEnabled = true;
+                    btnGuess.IsEnabled = true;
+                    btnHint.IsEnabled = true;
+                }
+
 
                 if (m_gameState.Players[m_playerID].HasTurn == null || m_gameState.CurrentWord == null)
                 {
@@ -91,7 +100,7 @@ namespace HangmanGUIClient
                     btnHint.IsEnabled = false;
                     if (m_gameState.CurrentWord == null && gameHasEnded == false)
                     {
-                        gameHasEnded = true;
+                        gameHasEnded = true; // to suppress the creation of a second notification window
 
                         Player winner = m_gameState.Players.OrderByDescending(p => p.LettersScore).FirstOrDefault();
 

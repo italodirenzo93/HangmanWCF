@@ -47,5 +47,26 @@ namespace HangmanGUIClient
                     MessageBoxImage.Error);
             }
         }
+
+        private void on_KeyDownEvent(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+            {
+                string word = tbWord.Text.ToUpper();
+                if (!string.IsNullOrWhiteSpace(word))
+                {
+                    m_gameState.GuessWord(word);
+                    this.Close();
+                }
+                else
+                {
+                    MessageBox.Show(
+                        "Please enter a word.",
+                        "Error",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Error);
+                }
+            }
+        }
     }
 }

@@ -8,7 +8,7 @@
         Title="Guess The Word" Height="120" Width="400"
         WindowStartupLocation="CenterOwner"
         ResizeMode="NoResize">
-    <Grid Margin="10">
+    <Grid Margin="10" KeyDown="on_KeyDownEvent">
         <Grid.RowDefinitions>
             <RowDefinition/>
             <RowDefinition Height="auto"/>
