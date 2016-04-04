@@ -52,16 +52,19 @@ namespace HangmanLibrary
         {
             get
             {
-                int currentWord_index = 0;
-                foreach(var w in m_words)
+                int current_index = 0;
+                if (CurrentWord != null)
                 {
-                    if (w.WordString != m_currentWord.Current.WordString)
-                        ++currentWord_index;
-                    else
-                        break;
+                    foreach (var w in m_words)
+                    {
+                        if (w.WordString != CurrentWord.WordString)
+                            ++current_index;
+                        else
+                            break;
+                    }
                 }
-                    
-                return m_words.Count - currentWord_index;
+
+                return m_words.Count - current_index;
             }
             private set { }
         }
