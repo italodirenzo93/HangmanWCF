@@ -52,16 +52,16 @@ namespace HangmanLibrary
         {
             get
             {
-                int current_index = 0;
+                int currentWord_index = 0;
                 foreach(var w in m_words)
                 {
                     if (w.WordString != m_currentWord.Current.WordString)
-                        ++current_index;
+                        ++currentWord_index;
                     else
                         break;
                 }
                     
-                return m_words.Count - current_index;
+                return m_words.Count - currentWord_index;
             }
             private set { }
         }
@@ -174,7 +174,7 @@ namespace HangmanLibrary
                 // Check for a win
                 if (new string(LetterTiles.ToArray()) == CurrentWord.WordString)
                 {
-                    UpdateMessage = "Word was found! " + CurrentWord.WordString;
+                    UpdateMessage = "Word completed! " + CurrentWord.WordString + ". A new word has started.";
                     NewWord();
                     ResetLetters();
                     foreach (Player pl in Players)
@@ -203,8 +203,8 @@ namespace HangmanLibrary
                 ResetLetters();
 
                 p.LettersGuessed.Clear();
-                foreach(var player in Players)
-                    player.IncorrectGuesses = 0;
+                foreach(var pl in Players)
+                    pl.IncorrectGuesses = 0;
             }
             else
             {
