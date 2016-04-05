@@ -143,14 +143,18 @@ namespace HangmanLibrary
 
         public void LeaveGame(int playerID)
         {
-            Player p = Players[playerID];
-            if (p.HasTurn == true)
-                QueueNextTurn();
+            // Ensure the player is in the collection
+            if (Players.Count - 1 >= playerID)
+            {
+                Player p = Players[playerID];
+                if (p.HasTurn == true)
+                    QueueNextTurn();
 
-            Players.Remove(p);
+                Players.Remove(p);
 
-            if (Players.Count > 0)
-                NotifyClients();
+                if (Players.Count > 0)
+                    NotifyClients();
+            }
         }
 
         public void GuessLetter(char ch)

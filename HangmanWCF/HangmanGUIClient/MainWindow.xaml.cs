@@ -83,9 +83,11 @@ namespace HangmanGUIClient
                 tbLettersRemaining.Text = m_gameState.LettersRemaining.Count.ToString();
 
                 if (!gameHasEnded)
-                UpdatePicture();
+                {
+                    UpdatePicture();
+                }
 
-                if (m_gameState.Players[m_playerID].HasTurn.HasValue)
+                if (!gameHasEnded && m_gameState.Players[m_playerID].HasTurn.HasValue)
                 {
                     icLetters.IsEnabled = true;
                     btnGuess.IsEnabled = true;
@@ -93,7 +95,7 @@ namespace HangmanGUIClient
                 }
 
 
-                if (m_gameState.Players[m_playerID].HasTurn == null || m_gameState.CurrentWord == null)
+                if (gameHasEnded || m_gameState.Players[m_playerID].HasTurn == null || m_gameState.CurrentWord == null)
                 {
                     icLetters.IsEnabled = false;
                     btnGuess.IsEnabled = false;
